@@ -1,0 +1,131 @@
+body {
+  background-color: #2a2b39;
+  margin: 0;
+  font-family: Arial, sans-serif;
+}
+
+.leaderboard-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  min-height: 100vh;
+}
+
+.leaderboard-container2 {
+  width: 90%;
+  max-width: 1200px;
+  color: white;
+}
+
+.first-three {
+  margin-top: 30px;
+  display: flex;
+  align-items: flex-end;
+  margin-bottom: 20px;
+  text-align: center;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.silver,
+.gold,
+.bronze {
+  width: 30%;
+  max-width: 300px;
+  height: auto;
+  background-color: #c0c0c0;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+  transition: 0.3s;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 10px;
+  position: relative;
+}
+
+.gold {
+  height: 230px;
+  background-image: linear-gradient(#daa520, #997415);
+}
+
+.silver {
+  height: 200px;
+  background-image: linear-gradient(#c0c0c0, #747474);
+}
+
+.bronze {
+  height: 170px;
+  background-image: linear-gradient(#cd7f32, #8b5722);
+}
+
+.silver:hover,
+.gold:hover,
+.bronze:hover {
+  transform: translateY(-10px);
+}
+
+.profile-picture {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  margin-top: 10px;
+}
+
+.sections {
+  background-color: #000003;
+  font-size: 12px;
+  display: flex;
+  justify-content: space-around;
+  text-align: center;
+  padding: 10px;
+  border-radius: 5px;
+}
+
+.sections h1 {
+  flex: 1;
+  margin: 0;
+  color: #bc7c19;
+}
+
+.student {
+  background-color: #22222e;
+  display: flex;
+  justify-content: space-around;
+  padding: 10px;
+  border-radius: 5px;
+  margin-bottom: 10px;
+}
+
+.student h3 {
+  flex: 1;
+  margin: 0;
+  text-align: center;
+}
+
+@media (max-width: 768px) {
+  .first-three {
+    display: none; /* Sakrij kartice za telefone */
+  }
+
+  .sections h1,
+  .student h3 {
+    font-size: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .sections h1,
+  .student h3 {
+    font-size: 8px;
+  }
+
+  .profile-picture {
+    width: 50px;
+    height: 50px;
+  }
+}
