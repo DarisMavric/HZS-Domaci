@@ -1,10 +1,29 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 const Main = () => {
   const [currentPage, setCurrentPage] = useState(0);
   const itemsPerPage = 2;
 
   const zanimanja = ["programiranje", "matematika", "istorija"];
+
+  useEffect(async () => {
+    const url = "https://tech-news3.p.rapidapi.com/venturebeat";
+    const options = {
+      method: "GET",
+      headers: {
+        "x-rapidapi-key": "3b4527075cmsh79523ddacf39cecp16c169jsn87d2fcb4ebd0",
+        "x-rapidapi-host": "tech-news3.p.rapidapi.com",
+      },
+    };
+
+    try {
+      const response = await fetch(url, options);
+      const result = await response.text();
+      console.log(result);
+    } catch (error) {
+      console.error(error);
+    }
+  }, []);
 
   const preporuceniKvizovi = [
     {
@@ -78,7 +97,7 @@ const Main = () => {
                   Kategorija: <span>{kviz.category}</span>
                 </p>
                 <p className="points-p">
-                  Poeni: <span>{kviz.points}</span>
+                  Poeni: <span> {"" + kviz.points}</span>
                 </p>
                 <p className="difficulty-p">
                   Težina: <span>{kviz.difficulty}</span>
