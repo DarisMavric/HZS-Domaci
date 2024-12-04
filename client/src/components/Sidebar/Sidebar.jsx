@@ -14,7 +14,7 @@ const Sidebar = () => {
 
       <div className="middle">
         <ul>
-          <li onClick={() => navigate("/")}>Kvizovi</li>
+          <li>Kvizovi</li>
           <li>Prijatelji</li>
           <li className="o3">Takmicenja</li>
         </ul>
