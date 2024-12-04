@@ -1,13 +1,12 @@
-import React from "react";
-import { Swiper, SwiperSlide } from "swiper/react";
-import { Navigation, Pagination, Scrollbar, A11y } from "swiper/modules";
-import "swiper/css";
-import "swiper/css/navigation";
-import "swiper/css/pagination";
-import "swiper/css/scrollbar";
+import React, { useState } from "react";
 
 const Main = () => {
-  const cardObject = [
+  const [currentPage, setCurrentPage] = useState(0);
+  const itemsPerPage = 2;
+
+  const zanimanja = ["programiranje", "matematika", "istorija"];
+
+  const preporuceniKvizovi = [
     {
       name: "JavaScript kviz",
       points: "100",
@@ -26,45 +25,107 @@ const Main = () => {
       category: "programiranje",
       difficulty: "teško",
     },
+    {
+      name: "Algebra osnove",
+      points: "80",
+      category: "matematika",
+      difficulty: "lako",
+    },
+    {
+      name: "CSS dizajn",
+      points: "120",
+      category: "programiranje",
+      difficulty: "srednje",
+    },
   ];
+
+  const filteredQuizzes = preporuceniKvizovi.filter((kviz) =>
+    zanimanja.includes(kviz.category)
+  );
+
+  const startIndex = currentPage * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentQuizzes = filteredQuizzes.slice(startIndex, endIndex);
+
+  const handleNext = () => {
+    if (endIndex < filteredQuizzes.length) {
+      setCurrentPage((prevPage) => prevPage + 1);
+    }
+  };
+
+  const handlePrev = () => {
+    if (currentPage > 0) {
+      setCurrentPage((prevPage) => prevPage - 1);
+    }
+  };
 
   return (
     <div className="main">
       <h1 className="main-h1">Kvizovi</h1>
+
       <div className="preporuceni-div">
         <h2 className="preporuceni">Preporučeni</h2>
-        <Swiper
-          modules={[Navigation, Pagination, Scrollbar, A11y]}
-          spaceBetween={10}
-          slidesPerView={2}
-          onSwiper={(swiper) => console.log(swiper)}
-          onSlideChange={() => console.log("slide change")}
-          className="preporuceni-quiz"
-        >
-          {cardObject.map((kviz, index) => (
-            <SwiperSlide key={index} className="kviz">
-              <div className="quiz">
-                <div className="up-quiz">
-                  <div className="quiz-photo"></div>
-                  <p className="quiz-name">{kviz.name}</p>
-                </div>
-                <div className="down-quiz">
-                  <p className="category-p">
-                    Kategorija:{" "}
-                    <span className="quiz-span">{kviz.category}</span>
-                  </p>
-                  <p className="points-quiz">
-                    Poeni: <span className="quiz-span">{kviz.points}</span>
-                  </p>
-                  <p className="category-p">
-                    Težina: <span className="quiz-span">{kviz.difficulty}</span>
-                  </p>
-                  <button className="pokreni-button">Pokreni</button>
-                </div>
+
+        <div className="preporuceni-kvizovi">
+          {currentQuizzes.map((kviz, index) => (
+            <div className="quiz" key={index}>
+              <div className="up-quiz">
+                <div className="quiz-photo"></div>
+                <p className="quiz-name">{kviz.name}</p>
               </div>
-            </SwiperSlide>
+              <div className="down-quiz">
+                <p className="category-p">
+                  Kategorija: <span>{kviz.category}</span>
+                </p>
+                <p className="points-p">
+                  Poeni: <span>{kviz.points}</span>
+                </p>
+                <p className="difficulty-p">
+                  Težina: <span>{kviz.difficulty}</span>
+                </p>
+                <button className="pokreni-button">Pokreni</button>
+              </div>
+            </div>
           ))}
-        </Swiper>
+        </div>
+
+        <div className="pagination-buttons">
+          <button onClick={handlePrev} disabled={currentPage === 0}>
+            Prethodni
+          </button>
+          <button
+            onClick={handleNext}
+            disabled={endIndex >= filteredQuizzes.length}
+          >
+            Sledeći
+          </button>
+        </div>
+      </div>
+
+      <div className="all-quizes">
+        <h2 className="preporuceni">Svi</h2>
+        <div className="svi-kvizovi">
+          {preporuceniKvizovi.map((kviz, index) => (
+            <div className="quiz" key={index}>
+              <div className="up-quiz">
+                <div className="quiz-photo"></div>
+                <p className="quiz-name">{kviz.name}</p>
+              </div>
+              <div className="down-quiz">
+                <p className="category-p">
+                  Kategorija: <span>{kviz.category}</span>
+                </p>
+                <p className="points-p">
+                  Poeni: <span>{kviz.points}</span>
+                </p>
+                <p className="difficulty-p">
+                  Težina: <span>{kviz.difficulty}</span>
+                </p>
+                <button className="pokreni-button">Pokreni</button>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );

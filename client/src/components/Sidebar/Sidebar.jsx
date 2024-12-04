@@ -1,7 +1,10 @@
 import React from "react";
 import "./Sidebar.css";
+import { useNavigate } from "react-router-dom";
 
 const Sidebar = () => {
+  const navigate = useNavigate();
+
   return (
     <div className="sidebar">
       <div className="top">
@@ -11,9 +14,9 @@ const Sidebar = () => {
 
       <div className="middle">
         <ul>
-          <li>Opcija 1</li>
-          <li>Opcija 2</li>
-          <li className="o3">Opcija 3</li>
+          <li onClick={() => navigate("/")}>Kvizovi</li>
+          <li>Prijatelji</li>
+          <li className="o3">Takmicenja</li>
         </ul>
       </div>
 
