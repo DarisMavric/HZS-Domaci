@@ -91,12 +91,12 @@ const challengeSchema = new mongoose.Schema({
   challengerId: { 
     type: mongoose.Schema.Types.ObjectId, 
     ref: 'users', 
-    required: true 
+    required: true
   },
   opponentId: { 
     type: mongoose.Schema.Types.ObjectId, 
-    ref: 'users', 
-    required: true 
+    ref: 'users',
+    default: null 
   },
   quizId: { 
     type: mongoose.Schema.Types.ObjectId, 
