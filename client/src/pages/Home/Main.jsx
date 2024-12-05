@@ -133,9 +133,11 @@ const Main = () => {
                   <p className="difficulty-p">
                     Težina: <span>{kviz.difficulty}</span>
                   </p>
-                  <Link className="pokreni-button" to={"/quiz/" + kviz._id}>
-                    Pokreni
-                  </Link>
+                  <div className="button-div">
+                    <Link className="pokreni-button" to={"/quiz/" + kviz._id}>
+                      Pokreni
+                    </Link>
+                  </div>
                 </div>
               </div>
             ))}
