@@ -2,6 +2,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import React, { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../../context/AuthContext";
+import { Link } from "react-router-dom";
 
 const Main = () => {
   const [currentPage, setCurrentPage] = useState(0);
@@ -101,8 +102,6 @@ const Main = () => {
     }
   };
 
-  console.log(currentUser?.interests);
-
   return (
     <div className="main">
       <h1 className="main-h1">Kvizovi</h1>
@@ -128,7 +127,7 @@ const Main = () => {
               <p className="difficulty-p">
                 Težina: <span>{kviz.difficulty}</span>
               </p>
-              <button className="pokreni-button">Pokreni</button>
+              <Link className="pokreni-button" to={"/quiz/"+kviz._id}>Pokreni</Link>
             </div>
           </div>
         ))}
@@ -166,7 +165,7 @@ const Main = () => {
                 <p className="difficulty-p">
                   Težina: <span>{kviz.difficulty}</span>
                 </p>
-                <button className="pokreni-button">Pokreni</button>
+                <Link className="pokreni-button" to={"/quiz/"+kviz._id}>Pokreni</Link>
               </div>
             </div>
           ))}
