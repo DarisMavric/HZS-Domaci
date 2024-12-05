@@ -63,8 +63,7 @@ export const logUser = async(req,res) => {
 }
 
 export const getUsers = async(req,res) => {
-    const {id} = req.body;
-    const user = await User.findById(id);
+    const user = await User.find();
     if(user) {
         return res.status(200).json(user);
     } else {
@@ -75,4 +74,14 @@ export const getUsers = async(req,res) => {
 export const logOut = async(req,res) => {
     res.clearCookie('accessToken');
     return res.status(200).json("Cookies deleted");
+}
+
+export const getUser = async(req,res) => {
+    const {id} = req.body;
+    const user = await User.findById(id);
+    if(user) {
+        return res.status(200).json(user);
+    } else {
+        return res.status(400).json('User does not exist!');
+    }
 }

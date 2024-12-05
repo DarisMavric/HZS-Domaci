@@ -18,7 +18,7 @@ const Sidebar = () => {
     queryKey: ["user", currentUser?._id],
     queryFn: async () =>
       axios
-        .post(`http://localhost:8080/api/user/getUsers`, {
+        .post(`http://localhost:8080/api/user/getUser`, {
           id: currentUser?._id
         })
         .then((res) => res.data),
