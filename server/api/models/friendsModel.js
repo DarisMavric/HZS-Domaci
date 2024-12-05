@@ -6,8 +6,18 @@ const FriendsSchema = new mongoose.Schema({
     ref: "users",
     required: true,
   },
+  username: {
+    type: String,
+    ref: "users",
+    required: true
+  },
   friendId: {
     type: mongoose.Schema.Types.ObjectId,
+    ref: "users",
+    required: true,
+  },
+  friendName: {
+    type: String,
     ref: "users",
     required: true,
   },

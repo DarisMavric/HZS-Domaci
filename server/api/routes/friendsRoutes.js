@@ -5,7 +5,7 @@ const router = express.Router();
 
 
 router.post('/addFriend',addFriend);
-router.get('/getFriends',getFriends);
+router.post('/getFriends',getFriends);
 router.post('/acceptRequest',acceptRequest);
 router.delete('/declineRequest',declineRequest);
 

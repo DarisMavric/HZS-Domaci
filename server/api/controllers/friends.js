@@ -5,6 +5,7 @@ import { User } from "../models/userModel.js";
 export const addFriend = async(req,res) => {
     const {userId,friendName} = req.body;
     const friend = await User.findOne({username: friendName});
+    const user = await User.findOne({_id: userId});
     const alreadyFriends = await Friends.findOne({
         $or: [
           { userId: userId, friendId: friend._id },
@@ -14,7 +15,9 @@ export const addFriend = async(req,res) => {
     if(!alreadyFriends){
         const friends = await Friends.create({
             userId,
-            friendId: friend._id
+            username: user.username,
+            friendId: friend._id,
+            friendName: friend.username
         })
         if(friends){
             return res.status(200).json(friends);
@@ -44,7 +47,7 @@ export const getFriends = async(req,res) => {
 }
 
 export const acceptRequest = async(req,res) => {
-    const {userId,requestId,} = req.body;
+    const {userId,requestId} = req.body;
     const friend = await Friends.findOne({
         $or: [
           { userId: userId, friendId: requestId },
