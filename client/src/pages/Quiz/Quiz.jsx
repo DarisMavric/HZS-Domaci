@@ -1,29 +1,33 @@
 import React, { useContext, useEffect, useState } from "react";
-import "../Quiz/Quiz.css";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import "./Quiz.css";
 import { useNavigate, useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import { AuthContext } from "../../context/AuthContext";
 
 const Quiz = () => {
   const { quizId } = useParams();
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [modalMessage, setModalMessage] = useState("");
+  const [showModal, setShowModal] = useState(false);
+  const [isCorrect, setIsCorrect] = useState(false);
 
-  const {currentUser} = useContext(AuthContext);
-
+  const { currentUser } = useContext(AuthContext);
   const navigate = useNavigate();
 
-  const { data: questionsData, isLoading, error } = useQuery({
+  const {
+    data: questionsData,
+    isLoading,
+    error,
+  } = useQuery({
     queryFn: async () =>
       await axios
         .get(`http://localhost:8080/api/quiz/getQuizQuestions/${quizId}`)
         .then((res) => res.data),
     queryKey: ["quizQuestions", quizId],
   });
-
-  
 
   useEffect(() => {
     toast.info("Welcome to the quiz!", {
@@ -50,50 +54,57 @@ const Quiz = () => {
   const questions = questionsData;
   const currentQuestion = questions[currentQuestionIndex];
   const options = currentQuestion?.options || {};
-
-  const optionsArray = Object.entries(options); // Convert options object to an array of [key, value] pairs
+  const optionsArray = Object.entries(options);
 
   const handleOptionClick = (selectedKey) => {
-    const selectedOption = options[selectedKey]; // Get the value of the selected option based on key
-    if (selectedKey === currentQuestion.correctAnswer) {
-      toast.success(`${currentQuestion.explanation}`, {
-        position: "top-center",
-        autoClose: 5000,
-      });
+    const isAnswerCorrect = selectedKey === currentQuestion.correctAnswer;
+    setIsCorrect(isAnswerCorrect);
+
+    if (isAnswerCorrect) {
+      setModalMessage("Correct answer!");
     } else {
-      toast.error("Wrong answer. Try again!", {
-        position: "top-center",
-        autoClose: 3000,
-      });
+      setModalMessage(
+        <>
+          <p>Wrong answer.</p>
+          <p>
+            <p>Correct asnwer : {currentQuestion.correctAnswer}</p>
+            <strong>Objasnjenje:</strong>
+            <p>{currentQuestion.explanation}</p>
+          </p>
+        </>
+      );
     }
+
+    setShowModal(true);
   };
 
   const handleNextQuestion = async () => {
-    try {
-      if (currentQuestionIndex < questions.length - 1) {
-        setCurrentQuestionIndex((prevIndex) => prevIndex + 1);
-      } else {
-        toast.success("You have completed the quiz!", { position: "top-center" });
+    setShowModal(false);
+    if (currentQuestionIndex < questions.length - 1) {
+      setCurrentQuestionIndex((prevIndex) => prevIndex + 1);
+    } else {
+      try {
         const response = await axios.post(
-          'http://localhost:8080/api/quiz/quizReward',
-          { userId: currentUser?._id, quizId: currentQuestion?.quizId }
+          "http://localhost:8080/api/quiz/quizReward",
+          {
+            userId: currentUser?._id,
+            quizId: currentQuestion?.quizId,
+          }
         );
-  
         if (response.data) {
-          console.log('Points updated successfully!');
-          toast.success('Your points have been updated!', { position: "top-center" });
-          navigate('/');
+          console.log("Points updated successfully!");
+          navigate("/");
         } else {
-          console.error('Failed to update points');
-          toast.error('Failed to update points', { position: "top-center" });
+          console.error("Failed to update points");
         }
+      } catch (error) {
+        console.error("Error completing the quiz:", error);
       }
-    } catch (error) {
-      console.error('Error while handling next question:', error);
-      toast.error('An error occurred while completing the quiz. Please try again later.', {
-        position: "top-center",
-      });
     }
+  };
+
+  const handleRetry = () => {
+    setShowModal(false);
   };
 
   const handlePreviousQuestion = () => {
@@ -119,7 +130,7 @@ const Quiz = () => {
             <p>No options available</p>
           )}
         </div>
-        <div className="quiz-navigation">
+        {/* <div className="quiz-navigation">
           <button
             onClick={handlePreviousQuestion}
             disabled={currentQuestionIndex === 0}
@@ -129,8 +140,20 @@ const Quiz = () => {
           <button onClick={handleNextQuestion}>
             {currentQuestionIndex < questions.length - 1 ? "Next" : "Finish"}
           </button>
-        </div>
+        </div> */}
       </div>
+      {showModal && (
+        <div className="modal">
+          <div className="modal-content">
+            <p>{modalMessage}</p>
+            {isCorrect ? (
+              <button onClick={handleNextQuestion}>Next</button>
+            ) : (
+              <button onClick={handleRetry}>Try Again</button>
+            )}
+          </div>
+        </div>
+      )}
       <ToastContainer />
     </div>
   );
