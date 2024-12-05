@@ -1,0 +1,47 @@
+.news {
+  margin: 20px auto;
+  max-width: 800px;
+  font-family: Arial, sans-serif;
+}
+
+.news-h1 {
+  text-align: center;
+  font-size: 2rem;
+  margin-bottom: 20px;
+}
+
+.news-container {
+  max-height: 900px; /* Visina okvira */
+  overflow-y: auto; /* Vertikalno skrolovanje */
+  border: 1px solid #ccc; /* Okvir oko liste */
+  padding: 10px;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+}
+
+.news-item {
+  margin-bottom: 20px;
+  padding: 10px;
+  border-bottom: 1px solid #eaeaea;
+}
+
+.news-item h3 {
+  font-size: 1.2rem;
+  color: #333;
+}
+
+.news-item p {
+  font-size: 1rem;
+  color: #666;
+  margin: 10px 0;
+}
+
+.news-item a {
+  font-size: 0.9rem;
+  color: #007bff;
+  text-decoration: none;
+}
+
+.news-item a:hover {
+  text-decoration: underline;
+}
