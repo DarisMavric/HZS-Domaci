@@ -2,7 +2,7 @@ import React, { useContext, useState } from "react";
 import "./Friends.css";
 import profilePicture from "../../assets/profile.png";
 import { FaUserPlus } from "react-icons/fa";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { AuthContext } from "../../context/AuthContext";
 
@@ -20,64 +20,65 @@ const Friends = () => {
       queryKey: ["friends"],
   });
 
+  const acceptRequest = useMutation({
+    mutationFn: async (data) => {
+      const response = await axios.post(
+        "http://localhost:8080/api/friends/acceptRequest",
+        data,
+        { withCredentials: true }
+      );
+      return response.data;
+    },
+    onSuccess: () => queryClient.invalidateQueries(["friends"]),
+    onError: (error) => console.error("Failed to accept request:", error),
+  });
+  
+  const declineRequest = useMutation({
+    mutationFn: async (data) => {
+      const response = await axios.post(
+        "http://localhost:8080/api/friends/declineRequest",
+        data,
+        { withCredentials: true }
+      );
+      return response.data;
+    },
+    onSuccess: () => queryClient.invalidateQueries(["friends"]),
+    onError: (error) => console.error("Failed to decline request:", error),
+  });
+
+  const addFriend = useMutation({
+    mutationFn: async (data) => {
+      const response = await axios.post(
+        "http://localhost:8080/api/friends/addFriend",
+        data,
+        { withCredentials: true }
+      );
+      return response.data;
+    },
+    onSuccess: () => queryClient.invalidateQueries(["friends"]),
+    onError: (error) => console.error("Failed to send request:", error),
+  });
+
+
   if (isLoading) {
     return <div>Loading quizzes...</div>;
   }
 
-  const mockedUsers = [
-    {
-      id: 1,
-      name: "John Doe",
-      status: "active",
-      profilePic: "https://example.com/john-doe.jpg",
-    },
-    {
-      id: 2,
-      name: "Jane Smith",
-      status: "inactive",
-      profilePic: "https://example.com/jane-smith.jpg",
-    },
-    {
-      id: 3,
-      name: "Alice Johnson",
-      status: "active",
-      profilePic: "https://example.com/alice-johnson.jpg",
-    },
-  ];
+  const accept = (friendId) => {
+    if (!currentUser) return console.error("User not logged in");
+    acceptRequest.mutate({ userId: currentUser?._id, requestId: friendId });
+  };
+  
+  const decline = (friendId) => {
+    if (!currentUser) return console.error("User not logged in");
+    declineRequest.mutate({ userId: currentUser?._id, requestId: friendId });
+  };
 
   const handleAddFriend = async() => {
     setIsModalOpen(false);
     setNewFriend({ name: "" });
-    try {
-      const response = await axios.post('http://localhost:8080/api/friends/addFriend', {
-        userId: currentUser?._id,
-        friendName: newFriend
-      });
-      return response.data;
-    } catch (error) {
-      console.error("Error sending friend request:", error);
-      throw error;
-    }
-  };
-
-  const accept = async (friendId) => {
-    console.log(friendId);
-    try {
-      const response = await axios.post('http://localhost:8080/api/friends/acceptRequest', {
-        userId: currentUser?._id,
-        requestId: friendId
-      });
-      return response.data;
-    } catch (error) {
-      console.error("Error accepting friend request:", error);
-      throw error; // Re-throw the error if you want to handle it elsewhere
-    }
-  };
-
-  const decline = (friendId) => {
-    console.log("New friend added:", newFriend);
-    setIsModalOpen(false);
-    setNewFriend({ name: "", status: "inactive" });
+    if (!currentUser) return console.error("User not logged in");
+    addFriend.mutate({ userId: currentUser?._id, friendName: newFriend });
   };
 
   return (
@@ -116,23 +117,23 @@ const Friends = () => {
             data?.filter((request) => request.status === "accepted")
             .map((user) => (
               <div key={user.id} className={`friend ${user.status}`}>
-                <img src={profilePicture} alt={user.name} />
+                <img src={profilePicture} alt={user.username} />
                 <div className="friend-info">
-                  <h3>{user.friendName}</h3>
+                  <h3>{user.username}</h3>
                   <p>friends</p>
                 </div>
               </div>
             ))}
           {activeTab === "requests" &&
-            data?.filter((request) => request.status === "pending")
+            data?.filter((request) => request.status === "pending" && request.friendId === currentUser?._id)
             .map((request) => (
               <div key={request.id} className="request">
-                <img src={profilePicture} alt={request.friendName} />
+                <img src={profilePicture} alt={request.username} />
                 <div className="request-info">
-                  <h3>{request.friendName}</h3>
+                  <h3>{request.username}</h3>
                   <div className="request-actions">
-                    <button className="accept" onClick={() => accept(request.friendId)}>Accept</button>
-                    <button className="decline" onClick={() => decline(request.friendId)}>Decline</button>
+                    <button className="accept" onClick={() => accept(request.userId)}>Accept</button>
+                    <button className="decline" onClick={() => decline(request.userId)}>Decline</button>
                   </div>
                 </div>
               </div>

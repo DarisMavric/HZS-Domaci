@@ -21,7 +21,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/leaderboard" element={<LeaderboardPage />} />
         <Route path="/friends" element={<Friends />} />
-        <Route path="/quiz" element={<Quiz />} />
+        <Route path="/quiz/:quizId" element={<Quiz />} />
       </Routes>
     </BrowserRouter>
   </QueryClientProvider>
