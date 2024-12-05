@@ -1,61 +1,74 @@
 import "./Leaderboard.css";
 import profilePicture from "../../assets/profile.png";
+import { useContext } from "react";
+import { AuthContext } from "../../context/AuthContext";
+import { useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import axios from "axios";
 
 const LeaderboardPage = () => {
+  const { currentUser } = useContext(AuthContext);
+  const navigate = useNavigate();
+
+  const { data, isLoading, error } = useQuery({
+    queryFn: async () =>
+      await axios
+        .get('http://localhost:8080/api/user/getUsers')
+        .then((res) => res.data),
+    queryKey: ["users"],
+  });
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>Error loading leaderboard data.</div>;
+  }
+
+  const sortedUsers = [...data].sort((a, b) => b.points - a.points);
+
+  const topThreeUsers = sortedUsers.slice(0, 3);
+
   return (
     <div className="leaderboard-container">
       <div className="leaderboard-container2">
         <div className="first-three">
-          <div className="silver">
-            <h1>Emin Redzovic</h1>
-            <img
-              className="profile-picture"
-              src={profilePicture}
-              alt="profilna slika"
-            />
-          </div>
-          <div className="gold">
-            <h1>Daris Mavric</h1>
-            <img
-              className="profile-picture"
-              src={profilePicture}
-              alt="profilna slika"
-            />
-          </div>
-          <div className="bronze">
-            <h1>Danilo Petrovic</h1>
-            <img
-              className="profile-picture"
-              src={profilePicture}
-              alt="profilna slika"
-            />
-          </div>
+          {topThreeUsers.map((user, index) => (
+            <div
+              key={user._id}
+              className={
+                index === 0
+                  ? "gold"
+                  : index === 1
+                  ? "silver"
+                  : "bronze"
+              }
+            >
+              <h1>{user.firstName} {user.lastName}</h1>
+              <img
+                className="profile-picture"
+                src={profilePicture}
+                alt="profile"
+              />
+            </div>
+          ))}
         </div>
 
         <div className="sections">
           <h1>Rank</h1>
           <h1>Ime</h1>
-          <h1>Zavrseni Kursevi</h1>
           <h1>Poeni</h1>
         </div>
-        <div className="student">
-          <h3>1</h3>
-          <h3>Daris Mavric</h3>
-          <h3>20</h3>
-          <h3>1208</h3>
-        </div>
-        <div className="student">
-          <h3>2</h3>
-          <h3>Emin Redzovic</h3>
-          <h3>18</h3>
-          <h3>1000</h3>
-        </div>
-        <div className="student">
-          <h3>3</h3>
-          <h3>Danilo Petrovic</h3>
-          <h3>10</h3>
-          <h3>650</h3>
-        </div>
+
+        {sortedUsers.map((user, index) => (
+          <div className="student" key={user._id}>
+            <h3>{index + 1}</h3>
+            <h3>{user.firstName} {user.lastName}</h3>
+            <h3>{user.completedCourses}</h3>
+            <h3>{user.points}</h3>
+          </div>
+        ))}
       </div>
     </div>
   );

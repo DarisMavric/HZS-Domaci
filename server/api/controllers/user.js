@@ -66,9 +66,8 @@ export const logUser = async(req,res) => {
     }
 }
 
-export const getUser = async(req,res) => {
-    const {email} = req.body;
-    const user = await User.findOne({email})
+export const getUsers = async(req,res) => {
+    const user = await User.find()
     if(user) {
         return res.status(200).json(user);
     } else {
