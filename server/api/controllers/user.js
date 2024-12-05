@@ -12,7 +12,6 @@ export const regUser = async(req,res) => {
     if(userAvailable) {
         return res.status(400).json('User already registered!');
     }
-
     const hashedPassword = await bcrypt.hash(password,10);
     const user = await User.create({
         firstName,
@@ -22,8 +21,6 @@ export const regUser = async(req,res) => {
         email,
         passwordHash: hashedPassword
     })
-
-
     if(user){
         const data = {
             _id: user._id,
@@ -36,7 +33,6 @@ export const regUser = async(req,res) => {
         return res.status(400).json('User data is not valid');
         console.log('Eror')
     }
-    
 }
 
 export const logUser = async(req,res) => {
@@ -67,7 +63,8 @@ export const logUser = async(req,res) => {
 }
 
 export const getUsers = async(req,res) => {
-    const user = await User.find()
+    const {id} = req.body;
+    const user = await User.findById(id);
     if(user) {
         return res.status(200).json(user);
     } else {
