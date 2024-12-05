@@ -1,36 +1,49 @@
+.friends {
+  display: flex;
+  background-color: rgb(187, 187, 187);
+}
+
 .container {
   display: flex;
   align-items: center;
-  padding-top: 100px;
   height: 100vh;
-
+  overflow-y: auto;
   flex-direction: column;
+  width: 80%;
+  background-color: rgb(187, 187, 187);
 }
+
 .container h2 {
-  color: rgb(131, 130, 130);
+  color: black;
+  margin-top: 100px;
 }
+
 p {
   color: rgb(131, 130, 130);
 }
+
 .friends-selector {
   display: flex;
   justify-content: space-around;
-  background-color: #1f2029;
+  background-color: #333333;
   border-radius: 2px;
 }
+
 .friends-selector p {
   font-size: 19px;
 }
+
 .friends-container {
   display: flex;
   flex-direction: column;
   width: 70%;
   justify-self: center;
+  margin-top: 50px;
 }
+
 .friends-selector {
   display: flex;
   justify-content: space-around;
-
   cursor: pointer;
 }
 
@@ -196,7 +209,7 @@ p {
 }
 
 .modal {
-  background: #2a2b39;
+  background: #333333;
   padding: 20px;
   border-radius: 10px;
   width: 300px;
@@ -210,7 +223,7 @@ p {
   margin: 0;
   text-align: center;
   font-size: 20px;
-  color: #fca311;
+  color: white;
 }
 
 .modal input,
@@ -224,6 +237,12 @@ p {
 .modal-actions {
   display: flex;
   justify-content: space-between;
+}
+
+@media screen and (max-width: 1023px) {
+  .container {
+    width: 100%;
+  }
 }
 
 @media (max-width: 768px) {

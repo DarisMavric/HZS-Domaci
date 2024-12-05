@@ -2,6 +2,8 @@ import React, { useEffect } from "react";
 import "../Quiz/Quiz.css";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import Sidebar from "../../components/Sidebar/Sidebar";
+import ResponsiveNav from "../../components/Sidebar/ResponsiveNav";
 
 const Quiz = () => {
   useEffect(() => {
@@ -24,18 +26,28 @@ const Quiz = () => {
   };
 
   return (
-    <div className="quiz-container">
-      <div className="quiz">
-        <div className="quiz-question">
-          {" "}
-          <p>{questions.question}</p>
+    <div className="quiz-div">
+      <div className="sidebar-div">
+        <Sidebar />
+      </div>
+
+      <div className="responsive-nav-div">
+        <ResponsiveNav />
+      </div>
+
+      <div className="quiz-container">
+        <div className="quiz">
+          <div className="quiz-question">
+            {" "}
+            <p>{questions.question}</p>
+          </div>
+          <div className="quiz-options">
+            {questions.options.map((option, index) => (
+              <button key={index}>{option}</button>
+            ))}
+          </div>
+          <button className="try-again">Try Again</button>
         </div>
-        <div className="quiz-options">
-          {questions.options.map((option, index) => (
-            <button key={index}>{option}</button>
-          ))}
-        </div>
-        <button>Try Again</button>
       </div>
       <ToastContainer />
     </div>

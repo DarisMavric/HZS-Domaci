@@ -8,20 +8,19 @@ import { AuthContext } from "../../context/AuthContext.js";
 const Register = () => {
   const navigate = useNavigate();
 
-  const [err,setErr] = useState('');
+  const [err, setErr] = useState("");
 
-  const {currentUser} = useContext(AuthContext);
+  const { currentUser } = useContext(AuthContext);
 
-  const {register} = useContext(AuthContext);
-
+  const { register } = useContext(AuthContext);
 
   useEffect(() => {
-    if(currentUser) {
-        navigate('/')
+    if (currentUser) {
+      navigate("/");
     } else {
-        navigate('/register');
+      navigate("/register");
     }
-  },[])
+  }, []);
 
   const interesovanja = [
     "programiranje",
@@ -60,11 +59,11 @@ const Register = () => {
       interests: Yup.array().min(1, "morate imati minimum jedno interesovanje"),
     }),
 
-    onSubmit: async(values) => {
+    onSubmit: async (values) => {
       try {
         console.log(values);
         await register(values);
-        navigate('/');
+        navigate("/");
       } catch (err) {
         setErr(err.response.data);
       }

@@ -6,7 +6,7 @@ import { AuthContext } from "../../context/AuthContext";
 const Main = () => {
   const [currentPage, setCurrentPage] = useState(0);
 
-  const {currentUser} = useContext(AuthContext);
+  const { currentUser } = useContext(AuthContext);
 
   const itemsPerPage = 2;
 
@@ -18,68 +18,46 @@ const Main = () => {
       const options = {
         method: "GET",
         headers: {
-          "x-rapidapi-key": "3b4527075cmsh79523ddacf39cecp16c169jsn87d2fcb4ebd0",
+          "x-rapidapi-key":
+            "3b4527075cmsh79523ddacf39cecp16c169jsn87d2fcb4ebd0",
           "x-rapidapi-host": "tech-news3.p.rapidapi.com",
         },
       };
-  
+
       try {
         const response = await fetch(url, options);
         const result = await response.text();
-        console.log(result);
       } catch (error) {
         console.error(error);
       }
     };
-  
+
     fetchNews();
   }, []);
 
   const queryClient = useQueryClient();
-    
-  const {data,isLoading} = useQuery({
-      queryFn: async() => await axios.get('http://localhost:8080/api/quiz/getQuizzes').then(res => {return res.data}),
-      queryKey: ["quizzes"],
+
+  const { data, isLoading } = useQuery({
+    queryFn: async () =>
+      await axios
+        .get("http://localhost:8080/api/quiz/getQuizzes")
+        .then((res) => {
+          return res.data;
+        }),
+    queryKey: ["quizzes"],
   });
 
   if (isLoading) {
-    return <div>Loading quizzes...</div>;
+    return (
+      <div className="loading-div">
+        <p>Loading quizzes...</p>
+      </div>
+    );
   }
 
-
-
-  const preporuceniKvizovi = [
-    {
-      name: "JavaScript kviz",
-      points: "100",
-      category: "programiranje",
-      difficulty: "srednje",
-    },
-    {
-      name: "Prvi sv. rat",
-      points: "50",
-      category: "istorija",
-      difficulty: "lako",
-    },
-    {
-      name: "React kviz",
-      points: "150",
-      category: "programiranje",
-      difficulty: "teško",
-    },
-    {
-      name: "Algebra osnove",
-      points: "80",
-      category: "matematika",
-      difficulty: "lako",
-    },
-    {
-      name: "CSS dizajn",
-      points: "120",
-      category: "programiranje",
-      difficulty: "srednje",
-    },
-  ];
+  const preporuceniKvizovi = data?.filter((kviz) =>
+    currentUser?.interests.includes(kviz.category)
+  );
 
   const filteredQuizzes = preporuceniKvizovi.filter((kviz) =>
     zanimanja.includes(kviz.category)
@@ -111,27 +89,28 @@ const Main = () => {
         <h2 className="preporuceni">Preporučeni</h2>
 
         <div className="preporuceni-kvizovi">
-        {data?.filter((kviz) => currentUser?.interests.includes(kviz.category))
-        .map((kviz, index) => (
-          <div className="quiz" key={index}>
-            <div className="up-quiz">
-              <div className="quiz-photo"></div>
-              <p className="quiz-name">{kviz.name}</p>
-            </div>
-            <div className="down-quiz">
-              <p className="category-p">
-                Kategorija: <span>{kviz.category}</span>
-              </p>
-              <p className="points-p">
-                Poeni: <span>{"" + kviz.points}</span>
-              </p>
-              <p className="difficulty-p">
-                Težina: <span>{kviz.difficulty}</span>
-              </p>
-              <button className="pokreni-button">Pokreni</button>
-            </div>
-          </div>
-        ))}
+          {data
+            ?.filter((kviz) => currentUser?.interests.includes(kviz.category))
+            .map((kviz, index) => (
+              <div className="quiz-card" key={index}>
+                <div className="up-quiz">
+                  <div className="quiz-photo"></div>
+                  <p className="quiz-name">{kviz.name}</p>
+                </div>
+                <div className="down-quiz">
+                  <p className="category-p">
+                    Kategorija: <span>{kviz.category}</span>
+                  </p>
+                  <p className="points-p">
+                    Poeni: <span>{"" + kviz.points}</span>
+                  </p>
+                  <p className="difficulty-p">
+                    Težina: <span>{kviz.difficulty}</span>
+                  </p>
+                  <button className="pokreni-button">Pokreni</button>
+                </div>
+              </div>
+            ))}
         </div>
 
         <div className="pagination-buttons">
@@ -151,7 +130,7 @@ const Main = () => {
         <h2 className="preporuceni">Svi</h2>
         <div className="svi-kvizovi">
           {data?.map((kviz, index) => (
-            <div className="quiz" key={index}>
+            <div className="quiz-card" key={index}>
               <div className="up-quiz">
                 <div className="quiz-photo"></div>
                 <p className="quiz-name">{kviz.title}</p>
