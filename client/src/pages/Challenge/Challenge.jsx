@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import "../Challenge/Challenge.css"
+import "../Challenge/Challenge.css";
 import { useNavigate, useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
@@ -17,6 +17,10 @@ const Challenge = () => {
   const [showModal, setShowModal] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
   const [waitingMessage, setWaitingMessage] = useState(""); // For waiting message
+  const [challengeStatus, setChallengeStatus] = useState(""); // For storing challenge result
+  const [isFinished, setIsFinished] = useState(false); // Track if the user finished the challenge
+  const [isBothPlayersConnected, setIsBothPlayersConnected] = useState(false); // Track if both players are connected
+  const [isButtonsDisabled, setIsButtonsDisabled] = useState(true); // Disable buttons until both players connect
 
   const { currentUser } = useContext(AuthContext);
   const navigate = useNavigate();
@@ -52,6 +56,8 @@ const Challenge = () => {
         position: "top-center",
         autoClose: 5000,
       });
+      setIsBothPlayersConnected(true); // Mark that both players are connected
+      setIsButtonsDisabled(false); // Enable buttons
     });
 
     // Listen for when there's no opponent and the user needs to wait
@@ -59,40 +65,72 @@ const Challenge = () => {
       setWaitingMessage("Waiting for another player...");
     });
 
+    // Listen for the results of the challenge
+    socket.on("user1Wins", () => {
+      setChallengeStatus("You win!");
+      setModalMessage("You win!"); // Display "You win!" message in the pop-up
+      setShowModal(true); // Show pop-up message
+    });
+
+    socket.on("user2Wins", () => {
+      setChallengeStatus("You lose!");
+      setModalMessage("You lose!"); // Display "You lose!" message in the pop-up
+      setShowModal(true); // Show pop-up message
+    });
+
+    socket.on("user1Loses", () => {
+      setChallengeStatus("You lose!");
+      setModalMessage("You lose!"); // Display "You lose!" message in the pop-up
+      setShowModal(true); // Show pop-up message
+    });
+
+    socket.on("user2Loses", () => {
+      setChallengeStatus("You win!");
+      setModalMessage("You win!"); // Display "You win!" message in the pop-up
+      setShowModal(true); // Show pop-up message
+    });
+
+    socket.on("draw", () => {
+      setChallengeStatus("It's a draw!");
+      setModalMessage("It's a draw!"); // Display draw message in the pop-up
+      setShowModal(true); // Show pop-up message
+    });
+
     return () => {
       socket.off("startChallenge");
       socket.off("waitingForOpponent");
+      socket.off("user1Wins");
+      socket.off("user2Wins");
+      socket.off("user1Loses");
+      socket.off("user2Loses");
+      socket.off("draw");
     };
   }, [currentUser?._id, id]);
 
-  if (isLoading) {
-    return <div>Loading data...</div>;
-  }
+  const submitAnswer = (selectedKey) => {
+    if (!questionsData || questionsData.length === 0) return;
 
-  if (error) {
-    return <div>Error loading challenge data</div>;
-  }
+    const currentQuestion = questionsData[currentQuestionIndex];
+    const correctAnswer = currentQuestion.correctAnswer;
+    const isAnswerCorrect = selectedKey === correctAnswer;
 
-  if (!questionsData || questionsData.length === 0) {
-    return <div>No questions available</div>;
-  }
+    // Emit 'submitAnswer' event with the user's answer and correct answers
+    socket.emit("submitAnswer", {
+      challengeId: id,
+      userId: currentUser?._id,
+      answers: [selectedKey], // Store the answers to be checked
+      correctAnswers: [correctAnswer], // Pass the correct answer from the question data
+    });
 
-  const questions = questionsData;
-  const currentQuestion = questions[currentQuestionIndex];
-  const options = currentQuestion?.options || {};
-  const optionsArray = Object.entries(options);
-
-  const handleOptionClick = (selectedKey) => {
-    const isAnswerCorrect = selectedKey === currentQuestion.correctAnswer;
+    // Set modal message based on correctness
     setIsCorrect(isAnswerCorrect);
-
     if (isAnswerCorrect) {
       setModalMessage("Correct answer!");
     } else {
       setModalMessage(
         <>
           <p>Wrong answer.</p>
-          <p>Correct answer: {currentQuestion.correctAnswer}</p>
+          <p>Correct answer: {correctAnswer}</p>
           <strong>Explanation:</strong>
           <p>{currentQuestion.explanation}</p>
         </>
@@ -102,28 +140,15 @@ const Challenge = () => {
     setShowModal(true);
   };
 
-  const handleNextQuestion = async () => {
+  const handleNextQuestion = () => {
     setShowModal(false);
-    if (currentQuestionIndex < questions.length - 1) {
+    if (currentQuestionIndex < questionsData.length - 1) {
       setCurrentQuestionIndex((prevIndex) => prevIndex + 1);
     } else {
-      try {
-        const response = await axios.post(
-          "http://localhost:8080/api/challenge/challengeReward",
-          {
-            userId: currentUser?._id,
-            challengeId: currentQuestion?.challengeId,
-          }
-        );
-        if (response.data) {
-          console.log("Points updated successfully!");
-          navigate("/");
-        } else {
-          console.error("Failed to update points");
-        }
-      } catch (error) {
-        console.error("Error completing the challenge:", error);
-      }
+      // Emit that the user has finished the challenge
+      socket.emit("finishChallenge", { challengeId: id, userId: currentUser?._id });
+      setIsFinished(true);
+      toast.success("Challenge finished!");
     }
   };
 
@@ -137,17 +162,38 @@ const Challenge = () => {
     }
   };
 
+  if (isLoading) {
+    return <div>Loading data...</div>;
+  }
+
+  if (error) {
+    return <div>Error loading challenge data</div>;
+  }
+
+  if (!questionsData || questionsData.length === 0) {
+    return <div>No questions available</div>;
+  }
+
+  const currentQuestion = questionsData[currentQuestionIndex];
+  const options = currentQuestion?.options || {};
+  const optionsArray = Object.entries(options);
+
   return (
     <div className="challenge-container">
       <div className="challenge">
         {waitingMessage && <p>{waitingMessage}</p>} {/* Display waiting message */}
+        {challengeStatus && <p>{challengeStatus}</p>} {/* Display challenge result */}
         <div className="challenge-question">
           <p>{currentQuestion?.questionText || "Question not available"}</p>
         </div>
         <div className="challenge-options">
           {optionsArray.length > 0 ? (
             optionsArray.map(([key, value], index) => (
-              <button key={index} onClick={() => handleOptionClick(key)}>
+              <button
+                key={index}
+                onClick={() => submitAnswer(key)}
+                disabled={isButtonsDisabled} // Disable buttons before both players connect
+              >
                 {value}
               </button>
             ))
@@ -158,12 +204,15 @@ const Challenge = () => {
         <div className="challenge-navigation">
           <button
             onClick={handlePreviousQuestion}
-            disabled={currentQuestionIndex === 0}
+            disabled={currentQuestionIndex === 0 || isButtonsDisabled} // Disable navigation buttons before both players connect
           >
             Previous
           </button>
-          <button onClick={handleNextQuestion}>
-            {currentQuestionIndex < questions.length - 1 ? "Next" : "Finish"}
+          <button
+            onClick={handleNextQuestion}
+            disabled={isButtonsDisabled} // Disable navigation buttons before both players connect
+          >
+            {currentQuestionIndex < questionsData.length - 1 ? "Next" : "Finish"}
           </button>
         </div>
       </div>
