@@ -25,9 +25,13 @@ export const regUser = async(req,res) => {
 
 
     if(user){
+        const data = {
+            _id: user._id,
+            interests: user.interests
+        }
         const token = jwt.sign({ id: user._id }, "secretkey");
         res.cookie("accessToken", token);
-        res.status(200).json(user.email,user.interests);
+        res.status(200).json(data);
     } else {
         return res.status(400).json('User data is not valid');
         console.log('Eror')
