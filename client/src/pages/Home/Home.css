@@ -64,10 +64,10 @@
   grid-gap: 20px;
 }
 
-.quiz {
+.quizq {
   background-color: #cdcdcd;
   border-radius: 10px;
-  padding: 15px;
+  padding: 35px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   margin: 5px;
   color: black;
@@ -98,7 +98,9 @@
   gap: 10px;
   margin-top: 10px;
 }
-
+.button-div {
+  margin-top: 20px;
+}
 .category-p,
 .points-p,
 .difficulty-p {
