@@ -1,29 +1,52 @@
-import React, { useEffect, useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import axios from "axios";
+import React, { useContext, useEffect, useState } from "react";
+import { AuthContext } from "../../context/AuthContext";
 
 const Main = () => {
   const [currentPage, setCurrentPage] = useState(0);
+
+  const {currentUser} = useContext(AuthContext);
+
   const itemsPerPage = 2;
 
   const zanimanja = ["programiranje", "matematika", "istorija"];
 
-  useEffect(async () => {
-    const url = "https://tech-news3.p.rapidapi.com/venturebeat";
-    const options = {
-      method: "GET",
-      headers: {
-        "x-rapidapi-key": "3b4527075cmsh79523ddacf39cecp16c169jsn87d2fcb4ebd0",
-        "x-rapidapi-host": "tech-news3.p.rapidapi.com",
-      },
+  useEffect(() => {
+    const fetchNews = async () => {
+      const url = "https://tech-news3.p.rapidapi.com/venturebeat";
+      const options = {
+        method: "GET",
+        headers: {
+          "x-rapidapi-key": "3b4527075cmsh79523ddacf39cecp16c169jsn87d2fcb4ebd0",
+          "x-rapidapi-host": "tech-news3.p.rapidapi.com",
+        },
+      };
+  
+      try {
+        const response = await fetch(url, options);
+        const result = await response.text();
+        console.log(result);
+      } catch (error) {
+        console.error(error);
+      }
     };
-
-    try {
-      const response = await fetch(url, options);
-      const result = await response.text();
-      console.log(result);
-    } catch (error) {
-      console.error(error);
-    }
+  
+    fetchNews();
   }, []);
+
+  const queryClient = useQueryClient();
+    
+  const {data,isLoading} = useQuery({
+      queryFn: async() => await axios.get('http://localhost:8080/api/quiz/getQuizzes').then(res => {return res.data}),
+      queryKey: ["quizzes"],
+  });
+
+  if (isLoading) {
+    return <div>Loading quizzes...</div>;
+  }
+
+
 
   const preporuceniKvizovi = [
     {
@@ -78,6 +101,8 @@ const Main = () => {
     }
   };
 
+  console.log(currentUser?.interests);
+
   return (
     <div className="main">
       <h1 className="main-h1">Kvizovi</h1>
@@ -86,26 +111,27 @@ const Main = () => {
         <h2 className="preporuceni">Preporučeni</h2>
 
         <div className="preporuceni-kvizovi">
-          {currentQuizzes.map((kviz, index) => (
-            <div className="quiz" key={index}>
-              <div className="up-quiz">
-                <div className="quiz-photo"></div>
-                <p className="quiz-name">{kviz.name}</p>
-              </div>
-              <div className="down-quiz">
-                <p className="category-p">
-                  Kategorija: <span>{kviz.category}</span>
-                </p>
-                <p className="points-p">
-                  Poeni: <span> {"" + kviz.points}</span>
-                </p>
-                <p className="difficulty-p">
-                  Težina: <span>{kviz.difficulty}</span>
-                </p>
-                <button className="pokreni-button">Pokreni</button>
-              </div>
+        {data?.filter((kviz) => currentUser?.interests.includes(kviz.category))
+        .map((kviz, index) => (
+          <div className="quiz" key={index}>
+            <div className="up-quiz">
+              <div className="quiz-photo"></div>
+              <p className="quiz-name">{kviz.name}</p>
             </div>
-          ))}
+            <div className="down-quiz">
+              <p className="category-p">
+                Kategorija: <span>{kviz.category}</span>
+              </p>
+              <p className="points-p">
+                Poeni: <span>{"" + kviz.points}</span>
+              </p>
+              <p className="difficulty-p">
+                Težina: <span>{kviz.difficulty}</span>
+              </p>
+              <button className="pokreni-button">Pokreni</button>
+            </div>
+          </div>
+        ))}
         </div>
 
         <div className="pagination-buttons">
@@ -124,11 +150,11 @@ const Main = () => {
       <div className="all-quizes">
         <h2 className="preporuceni">Svi</h2>
         <div className="svi-kvizovi">
-          {preporuceniKvizovi.map((kviz, index) => (
+          {data?.map((kviz, index) => (
             <div className="quiz" key={index}>
               <div className="up-quiz">
                 <div className="quiz-photo"></div>
-                <p className="quiz-name">{kviz.name}</p>
+                <p className="quiz-name">{kviz.title}</p>
               </div>
               <div className="down-quiz">
                 <p className="category-p">

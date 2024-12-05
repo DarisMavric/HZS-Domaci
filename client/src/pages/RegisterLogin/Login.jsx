@@ -1,11 +1,27 @@
-import React from "react";
+import React, { useContext, useEffect, useState } from "react";
 import "./RegisterLogin.css";
 import { useFormik } from "formik";
 import { useNavigate } from "react-router-dom";
 import * as Yup from "yup";
+import { AuthContext } from "../../context/AuthContext";
 
 const Register = () => {
   const navigate = useNavigate();
+
+  const [err,setErr] = useState('');
+
+  const {currentUser} = useContext(AuthContext);
+
+  const {login} = useContext(AuthContext);
+
+
+  useEffect(() => {
+    if(currentUser) {
+        navigate('/')
+    } else {
+        navigate('/login');
+    }
+  },[])
 
   const formik = useFormik({
     initialValues: {
@@ -23,9 +39,13 @@ const Register = () => {
         .max(20, "maksimalna duzina je 20 karaktera"),
     }),
 
-    onSubmit: (values) => {
-      console.log("Podaci za login:", values);
-      navigate("/");
+    onSubmit: async(values) => {
+      try {
+        await login(values);
+        navigate('/');
+      } catch (err) {
+        setErr(err.response.data);
+      }
     },
   });
 

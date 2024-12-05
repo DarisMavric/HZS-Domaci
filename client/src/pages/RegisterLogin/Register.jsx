@@ -1,11 +1,28 @@
-import React from "react";
+import React, { useContext, useEffect, useState } from "react";
 import "./RegisterLogin.css";
 import { useFormik } from "formik";
 import { useNavigate } from "react-router-dom";
 import * as Yup from "yup";
+import { AuthContext } from "../../context/AuthContext.js";
 
 const Register = () => {
   const navigate = useNavigate();
+
+  const [err,setErr] = useState('');
+
+  const {currentUser} = useContext(AuthContext);
+
+  const {register} = useContext(AuthContext);
+
+
+  useEffect(() => {
+    if(currentUser) {
+        navigate('/')
+    } else {
+        navigate('/register');
+    }
+  },[])
+
   const interesovanja = [
     "programiranje",
     "istorija",
@@ -17,7 +34,7 @@ const Register = () => {
 
   const formik = useFormik({
     initialValues: {
-      name: "",
+      firstName: "",
       lastName: "",
       username: "",
       email: "",
@@ -26,7 +43,7 @@ const Register = () => {
     },
 
     validationSchema: Yup.object({
-      name: Yup.string().required("obavezno polje"),
+      firstName: Yup.string().required("obavezno polje"),
       lastName: Yup.string().required("obavezno polje"),
       username: Yup.string()
         .required("obavezno polje")
@@ -43,9 +60,14 @@ const Register = () => {
       interests: Yup.array().min(1, "morate imati minimum jedno interesovanje"),
     }),
 
-    onSubmit: (values) => {
-      console.log("Podaci za registraciju:", values);
-      navigate("/login");
+    onSubmit: async(values) => {
+      try {
+        console.log(values);
+        await register(values);
+        navigate('/');
+      } catch (err) {
+        setErr(err.response.data);
+      }
     },
   });
 
@@ -70,14 +92,14 @@ const Register = () => {
           <div className="name-div">
             <input
               className="name-input"
-              name="name"
-              value={formik.values.name}
+              name="firstName"
+              value={formik.values.firstName}
               onBlur={formik.handleBlur}
               onChange={formik.handleChange}
               placeholder="Ime..."
             />
-            {formik.errors.name && formik.touched.name ? (
-              <p className="error">{formik.errors.name}</p>
+            {formik.errors.firstName && formik.touched.firstName ? (
+              <p className="error">{formik.errors.firstName}</p>
             ) : null}
           </div>
 
