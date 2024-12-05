@@ -5,6 +5,7 @@ import Login from "./pages/RegisterLogin/Login";
 import Home from "./pages/Home/Home";
 import LeaderboardPage from "./pages/Leaderboard/Leaderboard";
 import Friends from "./pages/Friends/Friends";
+import Quiz from "./pages/Quiz/Quiz";
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/leaderboard" element={<LeaderboardPage />} />
         <Route path="/friends" element={<Friends />} />
+        <Route path="/quiz" element={<Quiz />} />
       </Routes>
     </BrowserRouter>
   );
