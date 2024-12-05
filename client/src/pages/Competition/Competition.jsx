@@ -1,26 +1,49 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import "./Competition.css";
 import Sidebar from "../../components/Sidebar/Sidebar";
 import ResponsiveNav from "../../components/Sidebar/ResponsiveNav";
 import { ToastContainer, toast } from "react-toastify";
+import { AuthContext } from "../../context/AuthContext";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const Competition = () => {
   const [quizLink, setQuizLink] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
 
+  const { currentUser } = useContext(AuthContext);
+  const navigate = useNavigate();
+
   const categories = [
-    "General Knowledge",
-    "Science",
+    "istorija",
+    "programiranje",
     "Math",
     "History",
     "Technology",
   ];
 
-  const generateLink = () => {
-    console.log(selectedCategory);
+  const generateLink = async () => {
     if (selectedCategory !== "") {
-      const randomId = Math.random().toString(36).substring(2, 8);
-      setQuizLink(`https://quizapp.com/competition/${randomId}`);
+      console.log(currentUser?._id)
+      try {
+        const response = await axios.post('http://localhost:8080/api/challenge/createChallenge',{
+          challengerId: currentUser?._id,
+          category: selectedCategory
+        }).then(res => {return res.data});
+  
+        // Access the _id directly from response.data
+        const id = response.challengeId
+  
+        if (id) {
+          setQuizLink(`http://localhost:3000/challenge/${id}`);
+        }
+      } catch (error) {
+        console.error('Error creating challenge:', error);
+        toast.error('There was an error creating the challenge.', {
+          position: "top-center",
+          autoClose: 3000,
+        });
+      }
     } else {
       toast.error("Izaberite kategoriju.", {
         position: "top-center",

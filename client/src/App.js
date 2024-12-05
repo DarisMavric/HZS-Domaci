@@ -8,6 +8,7 @@ import Friends from "./pages/Friends/Friends";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import Quiz from "./pages/Quiz/Quiz";
 import Competition from "./pages/Competition/Competition";
+import Challenge  from "./pages/Challenge/Challenge";
 
 function App() {
   const queryClient = new QueryClient();
@@ -22,7 +23,7 @@ function App() {
           <Route path="/leaderboard" element={<LeaderboardPage />} />
           <Route path="/friends" element={<Friends />} />
           <Route path="/competition" element={<Competition />} />
-
+          <Route path="/challenge/:id" element={<Challenge />} />
           <Route path="/quiz/:quizId" element={<Quiz />} />
         </Routes>
       </BrowserRouter>

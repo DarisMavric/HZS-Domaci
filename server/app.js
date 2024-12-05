@@ -16,12 +16,15 @@ const app = express();
 
 const server = http.createServer(app);
 
-const io = new Server(server);
+const io = new Server(server, {
+  cors: {
+    origin: "http://localhost:3000", // Frontend URL
+    methods: ["GET", "POST"],
+    credentials: true,
+  }
+});
 
-app.use(cors({
-  origin: 'http://localhost:3000',
-  credentials: true
-}))
+app.use(cors({ origin: "*", methods: ["GET", "POST", "DELETE"], credentials: true }));
 
 
 app.use(bodyParser.urlencoded())
@@ -38,26 +41,48 @@ app.use('/api/quiz/',quizRoutes);
 app.use('/api/challenge/',challengeRoutes);
 
 
-io.on('connection', (socket) => {
-  console.log('User connected', socket.id);
+let waitingPlayers = {};
 
-  socket.on('joinRoom', (roomId, userId) => {
-    socket.join(roomId);
-    io.to(roomId).emit('playerJoined', userId);
+io.on("connection", (socket) => {
+  console.log(`User connected: ${socket.id}`);
+
+  // Listen for 'joinChallenge' event to register the player
+  socket.on("joinChallenge", ({ userId, challengeId }) => {
+    console.log(`${userId} joined challenge: ${challengeId}`);
+    
+    // Check if there's already a player waiting for this challenge
+    if (waitingPlayers[challengeId] && waitingPlayers[challengeId].length === 1) {
+      // Start the challenge if both players are ready
+      const opponentSocket = waitingPlayers[challengeId][0];
+      io.to(opponentSocket).emit("startChallenge");
+      socket.emit("startChallenge");
+
+      // Clear the waiting players for this challenge
+      waitingPlayers[challengeId] = [];
+    } else {
+      // If there's no one to challenge, add this player to the waiting list
+      if (!waitingPlayers[challengeId]) {
+        waitingPlayers[challengeId] = [];
+      }
+      waitingPlayers[challengeId].push(socket.id);
+      
+      // Notify the current player that they're waiting
+      socket.emit("waitingForOpponent");
+    }
   });
 
-  socket.on('submitAnswer', async (roomId, userId, answer) => {
-    // Handle player answer submission and update quiz state
-    await require('./controllers/quizController').handleAnswer(socket, roomId, userId, answer);
-  });
-
-  socket.on('disconnect', () => {
-    console.log('User disconnected');
+  // Listen for disconnections
+  socket.on("disconnect", () => {
+    console.log(`User disconnected: ${socket.id}`);
+    
+    // Remove user from any waiting list if they disconnect
+    for (const challengeId in waitingPlayers) {
+      waitingPlayers[challengeId] = waitingPlayers[challengeId].filter(
+        (id) => id !== socket.id
+      );
+    }
   });
 });
-
-
-
 
 server.listen(PORT,(error) => {
   if(!error)

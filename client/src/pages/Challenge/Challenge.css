@@ -1,0 +1,118 @@
+.challenge-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    padding: 10px;
+  }
+  
+  .challenge {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height: 60%;
+    width: 70%;
+    /* max-width: 800px; */
+    background-color: #444554;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  }
+  .challenge button {
+    width: 25%;
+    padding: 10px;
+    border-radius: 10px;
+    align-self: center;
+    margin-top: 20px;
+    max-width: 650px;
+    font-size: 18px;
+    font-weight: bold;
+    border: none;
+    border-radius: 10px;
+    color: white;
+    cursor: pointer;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    background-color: rgb(255, 84, 84);
+  }
+  
+  .challenge-question {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  .challenge-question p {
+    font-size: 30px;
+    letter-spacing: 2px;
+    text-align: center;
+    color: white;
+  }
+  
+  .challenge-options {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin-top: 15%;
+  }
+  
+  .challenge-options button {
+    display: block;
+    width: 100%;
+    padding: 25px 15px;
+    background-color: #4caf50;
+    color: white;
+    max-width: 650px;
+    font-size: 18px;
+    font-weight: bold;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+  }
+  
+  .challenge-options button:hover {
+    background-color: #45a049;
+    transform: scale(1.05);
+  }
+  
+  .challenge-options button:active {
+    background-color: #3e8e41;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  }
+  
+  @media (max-width: 768px) {
+    .challenge {
+      width: 90%;
+      height: auto;
+    }
+  
+    .challenge-question p {
+      font-size: 25px;
+    }
+  
+    .challenge-options {
+      grid-template-columns: 1fr;
+    }
+  
+    .challenge-options button {
+      font-size: 16px;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .challenge {
+      padding: 15px;
+    }
+  
+    .challenge-question p {
+      font-size: 20px;
+    }
+  
+    .challenge-options button {
+      padding: 10px;
+      font-size: 14px;
+    }
+  }
+  
