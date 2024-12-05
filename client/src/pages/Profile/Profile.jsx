@@ -144,41 +144,31 @@ const Profile = () => {
             onBlur={formik.handleBlur}
             disabled={!editStates.username}
           />
-          <button
-            type="button"
-            className="korisnicko-ime-button"
-            onClick={() => toggleEdit("username")}
-          >
-            <FaPen />
-          </button>
+
           {formik.errors.username && formik.touched.username && (
             <p className="error">{formik.errors.username}</p>
           )}
         </div>
 
         <div className="email-div-profile">
-          <div className="up-input">
-            <input
-              type="email"
-              name="email"
-              value={formik.values.email}
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-              disabled={!editStates.email}
-            />
-            <button
-              type="button"
-              className="email-button"
-              onClick={() => toggleEdit("email")}
-            >
-              <FaPen />
-            </button>
-          </div>
-          <div>
-            {formik.errors.email && formik.touched.email && (
-              <p className="error">{formik.errors.email}</p>
-            )}
-          </div>
+          <input
+            type="email"
+            name="email"
+            value={formik.values.email}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            disabled={!editStates.email}
+          />
+          <button
+            type="button"
+            className="email-button"
+            onClick={() => toggleEdit("email")}
+          >
+            <FaPen />
+          </button>
+          {formik.errors.email && formik.touched.email && (
+            <p className="error">{formik.errors.email}</p>
+          )}
         </div>
 
         <div className="password-div-profile">
@@ -230,7 +220,7 @@ const Profile = () => {
             <div className="last-3-interests">
               {interesovanja.slice(3).map((interesovanje) => (
                 <div
-                  className="single-interest"
+                  className="single-interest-profile"
                   key={interesovanje}
                   onClick={() => handleInterestClick(interesovanje)}
                 >
